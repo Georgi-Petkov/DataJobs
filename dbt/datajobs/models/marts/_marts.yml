@@ -1,0 +1,58 @@
+version: 2
+
+models:
+  - name: fct_postings_for_evaluation
+    description: Thin pass-through of stg_job_postings -- the surface PKH polls on its own schedule (watermarked on scraped_date) to find new postings worth running job_fit_agent.py against. See PKH_INTEGRATION.md.
+    columns:
+      - name: external_job_id
+        tests:
+          - not_null
+          - unique
+      - name: job_category
+        tests:
+          - not_null
+
+  - name: fct_postings_with_salary
+    description: Postings with a disclosed salary RANGE detected in the description (currency-anchored, two-sided). Simplified vs. PKH/ingest/salary_parser.py -- presence + raw snippet only, not normalized min/max/currency. See the model file for why.
+    columns:
+      - name: salary_range_raw
+        description: The matched salary-range text snippet, unparsed.
+        tests:
+          - not_null
+
+  - name: fct_posting_technologies
+    description: One row per posting that mentions at least one known technology/tool term, with all matched terms collected into an array. Postings matching zero terms don't appear here.
+    columns:
+      - name: external_job_id
+        tests:
+          - not_null
+          - unique
+      - name: mentioned_technologies
+        description: ARRAY<STRING> of canonical technology terms matched in the title+description. See seeds/technology_terms.csv.
+        tests:
+          - not_null
+
+  - name: fct_company_posting_trends
+    description: Postings by employer x posted-month x job_category -- answers "which company posted the most data jobs in a given month." Based on posted_date, not scraped_date.
+    columns:
+      - name: employer
+        tests:
+          - not_null
+      - name: posted_month
+        tests:
+          - not_null
+      - name: posting_count
+        tests:
+          - not_null
+
+seeds:
+  - name: technology_terms
+    description: Curated, growing list of technology/tool terms and their matching regex patterns. Starting list, not closed -- expand as new tools/terms come up in real postings.
+    columns:
+      - name: canonical_term
+        tests:
+          - not_null
+          - unique
+      - name: match_pattern
+        tests:
+          - not_null

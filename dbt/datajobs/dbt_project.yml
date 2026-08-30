@@ -1,0 +1,25 @@
+name: 'datajobs'
+version: '1.0.0'
+config-version: 2
+
+profile: 'datajobs'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+snapshot-paths: ["snapshots"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  datajobs:
+    staging:
+      +materialized: view
+      +schema: datajobs_silver
+    marts:
+      +materialized: table
+      +schema: datajobs_gold

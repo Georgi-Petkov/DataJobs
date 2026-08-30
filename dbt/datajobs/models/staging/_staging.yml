@@ -1,0 +1,50 @@
+version: 2
+
+sources:
+  - name: datajobs_bronze
+    database: workspace
+    schema: datajobs
+    tables:
+      - name: bronze_as3_raw
+        description: Raw AS3 Job Match postings, one row per posting, landed via Auto Loader inside a Lakeflow Declarative Pipeline. See ../../../ingest/source_contract.md for the raw shape.
+        config:
+          loaded_at_field: file_modification_time
+          freshness:
+            warn_after: {count: 26, period: hour}
+            error_after: {count: 50, period: hour}
+
+models:
+  - name: stg_job_postings
+    description: >
+      Bronze -> Silver. Dedups on (source_platform, external_job_id),
+      classifies each posting into one of 5 target categories (or drops it
+      if it's neither a category match nor a data-adjacent role worth
+      keeping as "other" -- see the model file for the exact rule, decided
+      interactively against real title data on 2026-08-30), normalizes
+      AS3's own origin-site field, and derives both a posted_date (from
+      AS3's own date string) and a scraped_date (from the landed
+      filename -- NOT file_modification_time, which reflects upload time,
+      not scrape time; confirmed empirically these differ).
+    columns:
+      - name: external_job_id
+        description: AS3's own job_id -- confirmed stable and recapture-safe across real re-scrapes.
+        tests:
+          - not_null
+      - name: job_category
+        description: One of data_analyst, data_engineer, data_scientist, business_intelligence, ai_engineer, or other.
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - data_analyst
+                  - data_engineer
+                  - data_scientist
+                  - business_intelligence
+                  - ai_engineer
+                  - other
+      - name: origin_site
+        description: Normalized origin site AS3 crawled the posting from (e.g. linkedin.dk, jobindex.dk) -- lowercased, "www." and the "(Crawler)"/"(Direct)"/"(Websites)" suffix stripped.
+      - name: posted_date
+        description: Date AS3 reports the posting was published.
+      - name: scraped_date
+        description: Date this posting was actually captured by /as3jobs, derived from the landed filename -- not file_modification_time, which only reflects when the file was uploaded to the volume.
