@@ -25,3 +25,12 @@ terraform/*.tfvars
 .env
 *.pem
 *.key
+
+# Raw scraped job postings — never commit, this repo is public.
+# /as3jobs (moved here from PKH) saves dated snapshots into data/as3_jobs_scan/.
+data/
+
+# Playwright MCP's local trace cache (console logs, page snapshots) --
+# /as3jobs will create this once actually run from here. Pure local
+# debugging output, regenerates automatically, never commit.
+.playwright-mcp/

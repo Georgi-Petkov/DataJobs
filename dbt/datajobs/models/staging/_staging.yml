@@ -48,3 +48,11 @@ models:
         description: Date AS3 reports the posting was published.
       - name: scraped_date
         description: Date this posting was actually captured by /as3jobs, derived from the landed filename -- not file_modification_time, which only reflects when the file was uploaded to the volume.
+      - name: language_guess
+        description: Heuristic, not a real language-detection library -- "danish" if the description has 10+ occurrences of æ/ø, else "english". A simple presence check was tried first and had a real false-positive problem (a single Danish place name or job-board UI chrome flipped fully-English postings); the count threshold was calibrated against real data (one true Danish posting at 23 occurrences, every false-positive source topping out at 7). See the model file for the full reasoning.
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - danish
+                  - english

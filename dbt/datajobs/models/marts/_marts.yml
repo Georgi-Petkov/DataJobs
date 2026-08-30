@@ -11,6 +11,10 @@ models:
       - name: job_category
         tests:
           - not_null
+      - name: language_guess
+        description: Either danish or english -- see stg_job_postings for the heuristic. Flagged because postings misjudged as a good fit despite being in Danish was the original real-world pain point this column exists to prevent.
+        tests:
+          - not_null
 
   - name: fct_postings_with_salary
     description: Postings with a disclosed salary RANGE detected in the description (currency-anchored, two-sided). Simplified vs. PKH/ingest/salary_parser.py -- presence + raw snippet only, not normalized min/max/currency. See the model file for why.

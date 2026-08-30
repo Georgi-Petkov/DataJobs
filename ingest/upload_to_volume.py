@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Copy already-scraped local JSON snapshots into the Bronze landing Volume.
 
-Source of truth for what to upload: PKH's own scan folders. This script
-does no scraping and no transformation -- it only moves files that already
-exist locally into cloud storage, skipping anything already uploaded.
-Run manually after a scrape session (`/as3jobs`, or a fresh LinkedIn save).
+Source of truth for what to upload: this repo's own data/ folder (gitignored
+-- never commit, this repo is public). This script does no scraping and no
+transformation -- it only moves files that already exist locally into cloud
+storage, skipping anything already uploaded. Run manually after a scrape
+session (`/as3jobs`).
 
 Usage: python3 ingest/upload_to_volume.py [--profile datajobs] [--dry-run]
 """
@@ -13,14 +14,14 @@ import subprocess
 import sys
 from pathlib import Path
 
-PKH_DATA = Path.home() / "Documents/Projects/PKH/data"
+REPO_DATA = Path(__file__).resolve().parent.parent / "data"
 
 # source_platform -> local folder, matching ingest/source_contract.md.
 # AS3 only -- its own `source` field already aggregates LinkedIn and
 # several other boards, so a separate linkedin_jobs_scan ingestion path
 # would be redundant (see source_contract.md).
 SOURCES = {
-    "as3": PKH_DATA / "as3_jobs_scan",
+    "as3": REPO_DATA / "as3_jobs_scan",
 }
 
 VOLUME_ROOT = "dbfs:/Volumes/workspace/datajobs/landing"

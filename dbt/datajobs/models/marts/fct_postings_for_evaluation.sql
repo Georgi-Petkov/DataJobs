@@ -23,6 +23,7 @@ select
     capture_method,
     seniority_raw,
     job_category,
+    language_guess,
     posted_date,
     scraped_date
 from {{ ref('stg_job_postings') }}

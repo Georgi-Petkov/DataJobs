@@ -64,7 +64,30 @@ classified as (
         -- to "linkedin.dk" -- capture_method (Crawler/Direct/Websites) kept
         -- as a separate column rather than folded into origin_site.
         lower(regexp_replace(regexp_replace(origin_site_raw, '\\s*\\([^)]*\\)', ''), '^www\\.', '')) as origin_site,
-        nullif(regexp_extract(origin_site_raw, '\\(([^)]+)\\)', 1), '') as capture_method
+        nullif(regexp_extract(origin_site_raw, '\\(([^)]+)\\)', 1), '') as capture_method,
+        -- Heuristic, not a real language-detection library. First version
+        -- (any æ/ø/å present) was verified against real data on 2026-08-30
+        -- and had a serious false-positive rate: a single mention of a
+        -- Danish place name (Copenhagen postings routinely say "København")
+        -- or a job board's Danish UI chrome ("Jobbeskrivelse"/"Ansøg nu"/
+        -- "Virksomhed:" labels, application-deadline footers) was enough to
+        -- flip a fully-English posting to "danish". Real distribution
+        -- checked across all 52 current postings: exactly one genuinely
+        -- Danish-language posting scored 23 occurrences of æ/ø; every
+        -- false-positive source (place names, UI chrome) topped out at 7.
+        -- Threshold of 10 sits with margin on both sides of that real gap.
+        -- Deliberately checks æ/ø only, not å -- å is shared with Swedish
+        -- (AS3 also crawls Swedish boards, whose own "Företag:"/
+        -- "Jobbannons-URL:" UI chrome uses ä/ö, not æ/ø, but does share å),
+        -- so dropping bare å avoids conflating the two. Named _guess
+        -- deliberately, same honesty convention as salary_range_raw being
+        -- unparsed text and job_category being a classification, not
+        -- ground truth.
+        case
+            when (length(description) - length(regexp_replace(description, '[æøÆØ]', ''))) >= 10
+                then 'danish'
+            else 'english'
+        end as language_guess
 
     from deduped
 
