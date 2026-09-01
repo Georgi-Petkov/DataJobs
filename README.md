@@ -14,11 +14,12 @@ for the full build history — what's real, what bugs were hit and fixed,
 what's still open.
 
 <p align="center">
-  <video src="https://raw.githubusercontent.com/Georgi-Petkov/DataJobs/main/design/demo/genie-datajobs-demo.mp4" controls muted playsinline width="360">
-    Demo: Genie querying the DataJobs Gold layer.
-  </video>
-  <br/>
-  <em>Genie (Databricks mobile) answering "Show me the latest 4 jobs" against the Gold layer — natural-language question → SQL → results.</em>
+  <img src="design/demo/genie-datajobs-demo.gif" alt="Genie querying the DataJobs Gold layer" width="360">
+</p>
+
+<p align="center">
+  <em>Genie (Databricks mobile) answering "Show me the latest 4 jobs" against the Gold layer — natural-language question → SQL → results.
+  (<a href="design/demo/genie-datajobs-demo.mp4">full-resolution video</a>)</em>
 </p>
 
 ```mermaid
