@@ -13,32 +13,46 @@ natural-language querying. See [`PIPELINE_ARCHITECTURE.md`](PIPELINE_ARCHITECTUR
 for the full build history — what's real, what bugs were hit and fixed,
 what's still open.
 
-```
-AS3 outplacement portal
-        │  /as3jobs skill (.claude/skills/as3jobs/, interactive, manual —
-        │  run it yourself, no scheduler by design)
-        ▼
-   data/as3_jobs_scan/*.json          (gitignored — this repo is public)
-        │
-        │  ingest/upload_to_volume.py (manual, run after a scrape)
-        ▼
-   Unity Catalog Volume (landing)
-        │  Auto Loader (cloudFiles), inside a Terraform-managed Lakeflow
-        │  Declarative Pipeline — no flatten/dedup here, deliberately
-        ▼
-BRONZE   bronze_as3_raw                        (Delta, Unity Catalog)
-        │  dbt — schema reconciliation + dedup + classify + augment,
-        │  scheduled via a Terraform-managed Databricks Job
-        ▼
-SILVER   stg_job_postings
-        │  dbt (gold marts)
-        ▼
-GOLD     fct_postings_for_evaluation / fct_postings_with_salary /
-         fct_posting_technologies / fct_company_posting_trends
-        │  PKH polls Gold on its own schedule (direct SQL, decoupled —
-        │  DataJobs doesn't know PKH exists)
-        ▼
-   PKH/ingest/query_job_market_gold.py — analysis, job-fit context
+```mermaid
+flowchart TD
+    AS3["AS3 outplacement portal"]
+    SKILL["/as3jobs skill<br/>interactive, manual — you run it,<br/>no scheduler by design"]
+    JSON[("data/as3_jobs_scan/*.json<br/>gitignored — this repo is public")]
+    UPLOAD["ingest/upload_to_volume.py<br/>manual, run after a scrape"]
+    VOL[("Unity Catalog Volume<br/>(landing)")]
+
+    subgraph AUTO["Terraform-managed daily job — 05:00 Europe/Copenhagen"]
+        direction TB
+        AL["Auto Loader (cloudFiles)<br/>Lakeflow Declarative Pipeline<br/>no flatten/dedup here, deliberately"]
+        BRONZE[["BRONZE<br/>bronze_as3_raw"]]
+        SILVER[["SILVER<br/>stg_job_postings"]]
+        GOLD[["GOLD<br/>fct_postings_for_evaluation<br/>fct_postings_with_salary<br/>fct_posting_technologies<br/>fct_company_posting_trends"]]
+        AL --> BRONZE
+        BRONZE -- "single dbt build run:<br/>reconcile schema · dedup · classify · augment" --> SILVER
+        SILVER -- "same run → gold marts" --> GOLD
+    end
+
+    POLL["PKH polls Gold on its own schedule<br/>direct SQL, decoupled —<br/>DataJobs doesn't know PKH exists"]
+    PKH["PKH/ingest/query_job_market_gold.py<br/>analysis, job-fit context"]
+
+    AS3 --> SKILL --> JSON --> UPLOAD --> VOL --> AL
+    GOLD --> POLL --> PKH
+
+    classDef external fill:#DDE8FF,stroke:#4A6FA5,color:#111
+    classDef manual fill:#FFF3D6,stroke:#C99A2E,color:#111,stroke-dasharray: 4 3
+    classDef storage fill:#EFEFEF,stroke:#888888,color:#111
+    classDef bronze fill:#CD7F32,stroke:#8B5A2B,color:#fff
+    classDef silver fill:#C7CDD6,stroke:#6E7580,color:#111
+    classDef gold fill:#FFD700,stroke:#B8860B,color:#111
+    classDef decoupled fill:#E4F4E4,stroke:#4C8C4A,color:#111
+
+    class AS3,PKH external
+    class SKILL,UPLOAD manual
+    class JSON,VOL storage
+    class BRONZE bronze
+    class SILVER silver
+    class GOLD gold
+    class POLL decoupled
 ```
 
 Genie space (`space_id: 01f1a4863d4c1d88982f6819eb80c370`) sits over
