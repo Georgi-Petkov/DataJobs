@@ -1,3 +1,5 @@
+![DataJobs](design/social/github-social-preview.png)
+
 # DataJobs
 
 Bronze/Silver/Gold data pipeline over AS3 outplacement portal job postings,
@@ -65,9 +67,9 @@ available on desktop and the Databricks mobile app.
 Two things drove this project — see `PIPELINE_ARCHITECTURE.md` for the
 full reasoning and real build history:
 
-1. **Cert-prep hands-on reps** on Databricks Lakeflow + Terraform, building
-   on a pattern already designed once (for [`healthkit-medallion-pipeline`](../healthkit-medallion-pipeline))
-   but never actually deployed.
+1. **Cert-prep hands-on reps** — real, hands-on practice with Databricks
+   Lakeflow and Terraform: designing, deploying, and operating a
+   production-grade pipeline end-to-end rather than following a tutorial.
 2. **Real job-search value** — turning ad hoc, print-to-stdout job-market
    analysis into persisted, queryable Gold tables that can actually inform
    decisions, with PKH consuming the results for job-fit evaluation.
