@@ -13,14 +13,9 @@ natural-language querying. See [`PIPELINE_ARCHITECTURE.md`](PIPELINE_ARCHITECTUR
 for the full build history — what's real, what bugs were hit and fixed,
 what's still open.
 
-<p align="center">
-  <img src="design/demo/genie-datajobs-demo.gif" alt="Genie querying the DataJobs Gold layer" width="360">
-</p>
+![Genie querying the DataJobs Gold layer](design/demo/genie-datajobs-demo.gif)
 
-<p align="center">
-  <em>Genie (Databricks mobile) answering "Show me the latest 4 jobs" against the Gold layer — natural-language question → SQL → results.
-  (<a href="design/demo/genie-datajobs-demo.mp4">full-resolution video</a>)</em>
-</p>
+*Genie (Databricks mobile) answering "Show me the latest 4 jobs" against the Gold layer — natural-language question → SQL → results. ([full-resolution video](design/demo/genie-datajobs-demo.mp4))*
 
 ```mermaid
 flowchart TD
