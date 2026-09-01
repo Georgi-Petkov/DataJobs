@@ -5,7 +5,7 @@
 Bronze/Silver/Gold data pipeline over AS3 outplacement portal job postings,
 built to practice Databricks Lakeflow + dbt + Terraform, and to actually
 drive real job-search decisions by exposing a Gold layer to
-[PKH](../PKH) (a personal knowledge graph / job-fit agent) for analysis.
+[PKH](https://github.com/Georgi-Petkov/personalknowhow) (a personal knowledge graph / job-fit agent) for analysis.
 
 **Status: live.** Bronze, Silver, and Gold are all real, deployed, and
 scheduled daily via Terraform-managed jobs. A Genie space exists for
